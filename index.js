@@ -1,15 +1,21 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
-    authDomain: "vissapro-aa91d.firebaseapp.com",
-    projectId: "vissapro-aa91d",
-    storageBucket: "vissapro-aa91d.firebasestorage.app",
-    messagingSenderId: "866553327331",
-    appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
-};
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyB5wZsZwi2KNqlK_HK0GUkdvd9TGtJ4wLE",
+    authDomain: "damith-ef0c4.firebaseapp.com",
+    projectId: "damith-ef0c4",
+    storageBucket: "damith-ef0c4.firebasestorage.app",
+    messagingSenderId: "949675663684",
+    appId: "1:949675663684:web:1620c9e8a57e376573b711",
+    measurementId: "G-285XGS4KX6"
+  };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
