@@ -23,15 +23,21 @@ import {
    FIREBASE CONFIG
 ========================================================= */
 
+// Import the functions you need from the SDKs you need
+
 const firebaseConfig = {
-    apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
-    authDomain: "vissapro-aa91d.firebaseapp.com",
-    projectId: "vissapro-aa91d",
-    storageBucket: "vissapro-aa91d.firebasestorage.app",
-    messagingSenderId: "866553327331",
-    appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
+  apiKey: "AIzaSyBXWGA5kBY0qhmkL-wKZJ16VCjKsZM-4Gg",
+  authDomain: "commerce-with-damith-manage.firebaseapp.com",
+  projectId: "commerce-with-damith-manage",
+  storageBucket: "commerce-with-damith-manage.firebasestorage.app",
+  messagingSenderId: "646197742634",
+  appId: "1:646197742634:web:0d4d69112babfba61d0753",
+  measurementId: "G-DLSWTPW732"
 };
 
+// Initialize Firebase
+
+const analytics = getAnalytics(app
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
