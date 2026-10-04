@@ -1,7 +1,4 @@
-/* =========================================================
-   FIREBASE IMPORTS
-========================================================= */
-
+```javascript
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -10,9 +7,7 @@ import {
     getAuth,
     GoogleAuthProvider,
     FacebookAuthProvider,
-    signInWithPopup,
-    signInWithEmailAndPassword,
-    signOut
+    signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 import {
@@ -24,64 +19,40 @@ import {
     getDoc
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-
 /* =========================================================
    FIREBASE CONFIG
 ========================================================= */
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBXWGA5kBY0qhmkL-wKZJ16VCjKsZM-4Gg",
-    authDomain: "damith-manage.vissapro581.workers.dev",
-    projectId: "commerce-with-damith-manage",
-    storageBucket: "commerce-with-damith-manage.firebasestorage.app",
-    messagingSenderId: "646197742634",
-    appId: "1:646197742634:web:0d4d69112babfba61d0753",
-    measurementId: "G-DLSWTPW732"
+    apiKey: "AIzaSyA6npygmtNl42_xnHjUnWf332QnrBDn1IM",
+    authDomain: "vissapro-aa91d.firebaseapp.com",
+    projectId: "vissapro-aa91d",
+    storageBucket: "vissapro-aa91d.firebasestorage.app",
+    messagingSenderId: "866553327331",
+    appId: "1:866553327331:web:60ef47fa0c88a942571fd6"
 };
-
-
-/* =========================================================
-   INITIALIZE FIREBASE
-========================================================= */
 
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
-
 const db = getFirestore(app);
-
-
-/*
-   IMPORTANT:
-   Analytics is NOT required for this application.
-
-   DO NOT use:
-
-   const analytics = getAnalytics(app
-
-   That was causing the previous JavaScript error.
-*/
 
 
 /* =========================================================
    GLOBAL VARIABLES
 ========================================================= */
 
-const MY_ADMIN_GMAIL =
-    "vimukthithuhina754@gmail.com";
+const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com";
 
 let singleVideos = [];
-
 let playlistsData = [];
 
 let currentView = "videos";
-
 let selectedPlaylistId = null;
 
 let isAdminLoggedIn = false;
 
 let generatedOTP = null;
-
 let pendingEmail = "";
 
 
@@ -89,101 +60,26 @@ let pendingEmail = "";
    GOOGLE LOGIN
 ========================================================= */
 
-window.triggerGoogleLogin = async function () {
+window.triggerGoogleLogin = function () {
 
-    try {
+    const provider = new GoogleAuthProvider();
 
-        const provider =
-            new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
 
-        provider.setCustomParameters({
-            prompt: "select_account"
-        });
+        .then((res) => {
 
-        const result =
-            await signInWithPopup(
-                auth,
-                provider
+            loginSuccess(res.user.email);
+
+        })
+
+        .catch((err) => {
+
+            alert(
+                "Google Sign-In Error: " +
+                err.message
             );
 
-        if (
-            result &&
-            result.user
-        ) {
-
-            const email =
-                result.user.email ||
-                "";
-
-            if (!email) {
-
-                throw new Error(
-                    "Google account email was not received."
-                );
-
-            }
-
-            await loginSuccess(email);
-
-        }
-
-    } catch (err) {
-
-        console.error(
-            "Google Login Error:",
-            err
-        );
-
-        let message =
-            "Google Sign-In Error\n\n";
-
-        if (err.code) {
-
-            message +=
-                "Code: " +
-                err.code +
-                "\n\n";
-
-        }
-
-        message +=
-            err.message ||
-            "Google login failed.";
-
-        if (
-            err.code ===
-            "auth/unauthorized-domain"
-        ) {
-
-            message +=
-                "\n\nFirebase Console එකේ Authentication → Settings → Authorized domains තුළ ඔයාගේ website domain එක add කරලා තියෙනවාද බලන්න.";
-
-        }
-
-        if (
-            err.code ===
-            "auth/popup-blocked"
-        ) {
-
-            message +=
-                "\n\nBrowser එකේ popup blocking disable කරන්න.";
-
-        }
-
-        if (
-            err.code ===
-            "auth/popup-closed-by-user"
-        ) {
-
-            message =
-                "Google login popup එක close කරලා තියෙනවා.";
-
-        }
-
-        alert(message);
-
-    }
-
+        });
 };
 
 
@@ -191,436 +87,170 @@ window.triggerGoogleLogin = async function () {
    FACEBOOK LOGIN
 ========================================================= */
 
-window.triggerFacebookLogin = async function () {
+window.triggerFacebookLogin = function () {
 
-    try {
+    const provider = new FacebookAuthProvider();
 
-        const provider =
-            new FacebookAuthProvider();
+    signInWithPopup(auth, provider)
 
-        provider.setCustomParameters({
-            display: "popup"
+        .then((res) => {
+
+            loginSuccess(
+                res.user.email ||
+                "facebook_user@vissapro.com"
+            );
+
+        })
+
+        .catch((err) => {
+
+            alert(
+                "Facebook Sign-In Error: " +
+                err.message
+            );
+
         });
-
-        const result =
-            await signInWithPopup(
-                auth,
-                provider
-            );
-
-        if (
-            result &&
-            result.user
-        ) {
-
-            const email =
-                result.user.email ||
-                "facebook_user@commerce-with-damith.com";
-
-            await loginSuccess(email);
-
-        }
-
-    } catch (err) {
-
-        console.error(
-            "Facebook Login Error:",
-            err
-        );
-
-        let message =
-            "Facebook Sign-In Error\n\n";
-
-        if (err.code) {
-
-            message +=
-                "Code: " +
-                err.code +
-                "\n\n";
-
-        }
-
-        message +=
-            err.message ||
-            "Facebook login failed.";
-
-        alert(message);
-
-    }
-
 };
-
-
-/* =========================================================
-   EMAIL + PASSWORD LOGIN
-========================================================= */
-
-window.loginWithEmailPassword =
-    async function () {
-
-        const emailInput =
-            document.getElementById(
-                "loginEmail"
-            );
-
-        const passwordInput =
-            document.getElementById(
-                "loginPassword"
-            );
-
-
-        const email =
-            emailInput
-                ? emailInput.value.trim()
-                : "";
-
-        const password =
-            passwordInput
-                ? passwordInput.value
-                : "";
-
-
-        if (!email) {
-
-            alert(
-                "Email address එක ඇතුළත් කරන්න."
-            );
-
-            if (emailInput) {
-                emailInput.focus();
-            }
-
-            return;
-
-        }
-
-
-        if (!password) {
-
-            alert(
-                "Password එක ඇතුළත් කරන්න."
-            );
-
-            if (passwordInput) {
-                passwordInput.focus();
-            }
-
-            return;
-
-        }
-
-
-        try {
-
-            const result =
-                await signInWithEmailAndPassword(
-                    auth,
-                    email,
-                    password
-                );
-
-
-            if (
-                result &&
-                result.user
-            ) {
-
-                await loginSuccess(
-                    result.user.email ||
-                    email
-                );
-
-            }
-
-        } catch (err) {
-
-            console.error(
-                "Email Password Login Error:",
-                err
-            );
-
-            let message =
-                "Login failed.\n\n";
-
-            if (err.code) {
-
-                message +=
-                    "Code: " +
-                    err.code +
-                    "\n\n";
-
-            }
-
-            switch (err.code) {
-
-                case "auth/invalid-credential":
-
-                    message +=
-                        "Email හෝ Password එක වැරදියි.";
-
-                    break;
-
-                case "auth/invalid-email":
-
-                    message +=
-                        "Email address එක නිවැරදි නැහැ.";
-
-                    break;
-
-                case "auth/user-not-found":
-
-                    message +=
-                        "මෙම Email එකෙන් account එකක් හමු වුණේ නැහැ.";
-
-                    break;
-
-                case "auth/wrong-password":
-
-                    message +=
-                        "Password එක වැරදියි.";
-
-                    break;
-
-                case "auth/too-many-requests":
-
-                    message +=
-                        "Login attempts වැඩි නිසා තාවකාලිකව block කර ඇත. පසුව නැවත උත්සාහ කරන්න.";
-
-                    break;
-
-                default:
-
-                    message +=
-                        err.message ||
-                        "Unknown login error.";
-
-            }
-
-            alert(message);
-
-        }
-
-    };
-
-
-/* =========================================================
-   PASSWORD SHOW / HIDE
-========================================================= */
-
-window.togglePassword =
-    function () {
-
-        const input =
-            document.getElementById(
-                "loginPassword"
-            );
-
-        const eye =
-            document.getElementById(
-                "passwordEye"
-            );
-
-
-        if (!input) {
-
-            return;
-
-        }
-
-
-        const isPassword =
-            input.type === "password";
-
-
-        input.type =
-            isPassword
-                ? "text"
-                : "password";
-
-
-        if (eye) {
-
-            eye.className =
-                isPassword
-                    ? "fa-solid fa-eye-slash"
-                    : "fa-solid fa-eye";
-
-        }
-
-    };
 
 
 /* =========================================================
    LOGIN BUTTON EVENTS
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+const googleLoginBtn =
+    document.getElementById("googleLoginBtn");
 
-        const googleLoginBtn =
-            document.getElementById(
-                "googleLoginBtn"
-            );
+if (googleLoginBtn) {
 
-        if (googleLoginBtn) {
+    googleLoginBtn.addEventListener(
+        "click",
+        window.triggerGoogleLogin
+    );
 
-            googleLoginBtn.addEventListener(
-                "click",
-                window.triggerGoogleLogin
-            );
-
-        }
+}
 
 
-        const facebookLoginBtn =
-            document.getElementById(
-                "facebookLoginBtn"
-            );
+const facebookLoginBtn =
+    document.getElementById("facebookLoginBtn");
 
-        if (facebookLoginBtn) {
+if (facebookLoginBtn) {
 
-            facebookLoginBtn.addEventListener(
-                "click",
-                window.triggerFacebookLogin
-            );
+    facebookLoginBtn.addEventListener(
+        "click",
+        window.triggerFacebookLogin
+    );
 
-        }
-
-    }
-);
+}
 
 
 /* =========================================================
    FIRESTORE - LOAD DATA
 ========================================================= */
 
-window.cloudFetchData =
-    async function () {
+window.cloudFetchData = async function () {
 
-        try {
+    try {
 
-            /* -----------------------------------------
-               SINGLE VIDEOS
-            ----------------------------------------- */
+        /* -------------------------------
+           SINGLE VIDEOS
+        -------------------------------- */
 
-            const singleDocRef =
-                doc(
-                    db,
-                    "appData",
-                    "singleVideosDoc"
-                );
+        const singleDocRef =
+            doc(
+                db,
+                "appData",
+                "singleVideosDoc"
+            );
 
+        const singleDocSnap =
+            await getDoc(singleDocRef);
 
-            const singleDocSnap =
-                await getDoc(
-                    singleDocRef
-                );
+        let sVideos = [];
 
+        if (singleDocSnap.exists()) {
 
-            let sVideos = [];
+            const data =
+                singleDocSnap.data();
 
+            if (Array.isArray(data.videos)) {
 
-            if (
-                singleDocSnap.exists()
+                sVideos = data.videos;
+
+            } else if (
+                Array.isArray(data.singleVideos)
             ) {
 
-                const data =
-                    singleDocSnap.data();
-
-
-                if (
-                    Array.isArray(
-                        data.videos
-                    )
-                ) {
-
-                    sVideos =
-                        data.videos;
-
-                } else if (
-                    Array.isArray(
-                        data.singleVideos
-                    )
-                ) {
-
-                    sVideos =
-                        data.singleVideos;
-
-                }
+                sVideos =
+                    data.singleVideos;
 
             }
 
-
-            /* -----------------------------------------
-               PLAYLISTS
-            ----------------------------------------- */
-
-            const plSnap =
-                await getDocs(
-                    collection(
-                        db,
-                        "playlists"
-                    )
-                );
-
-
-            const pData = [];
-
-
-            plSnap.forEach(
-                function (d) {
-
-                    const data =
-                        d.data();
-
-
-                    pData.push({
-
-                        id:
-                            data.id ||
-                            d.id,
-
-                        name:
-                            data.name ||
-                            "Untitled Playlist",
-
-                        videos:
-                            Array.isArray(
-                                data.videos
-                            )
-                                ? data.videos
-                                : []
-
-                    });
-
-                }
-            );
-
-
-            return {
-
-                singleVideos:
-                    sVideos,
-
-                playlistsData:
-                    pData
-
-            };
-
-
-        } catch (e) {
-
-            console.error(
-                "Firestore Fetch Error:",
-                e
-            );
-
-            throw e;
-
         }
 
-    };
+
+        /* -------------------------------
+           PLAYLISTS
+        -------------------------------- */
+
+        const plSnap =
+            await getDocs(
+                collection(db, "playlists")
+            );
+
+        const pData = [];
+
+
+        plSnap.forEach((d) => {
+
+            const data = d.data();
+
+            pData.push({
+
+                id:
+                    data.id ||
+                    d.id,
+
+                name:
+                    data.name ||
+                    "Untitled Playlist",
+
+                videos:
+                    Array.isArray(data.videos)
+                        ? data.videos
+                        : []
+
+            });
+
+        });
+
+
+        return {
+
+            singleVideos: sVideos,
+
+            playlistsData: pData
+
+        };
+
+
+    } catch (e) {
+
+        console.error(
+            "Firestore Fetch Error:",
+            e
+        );
+
+        return {
+
+            singleVideos: [],
+
+            playlistsData: []
+
+        };
+
+    }
+
+};
 
 
 /* =========================================================
@@ -642,11 +272,7 @@ window.cloudAddPlaylistToDB =
 
                 {
 
-                    id:
-                        plObj.id,
-
-                    name:
-                        plObj.name,
+                    ...plObj,
 
                     videos:
                         Array.isArray(
@@ -658,7 +284,6 @@ window.cloudAddPlaylistToDB =
                 }
 
             );
-
 
             return true;
 
@@ -691,10 +316,7 @@ window.cloudAddVideoToDB =
 
         try {
 
-            if (
-                targetPlId ===
-                "none"
-            ) {
+            if (targetPlId === "none") {
 
                 await setDoc(
 
@@ -720,19 +342,12 @@ window.cloudAddVideoToDB =
             } else {
 
                 const targetPl =
-                    (
-                        playlistsArr ||
-                        []
-                    ).find(
-                        function (p) {
-
-                            return (
+                    (playlistsArr || [])
+                        .find(
+                            p =>
                                 p.id ===
                                 targetPlId
-                            );
-
-                        }
-                    );
+                        );
 
 
                 if (!targetPl) {
@@ -754,11 +369,7 @@ window.cloudAddVideoToDB =
 
                     {
 
-                        id:
-                            targetPl.id,
-
-                        name:
-                            targetPl.name,
+                        ...targetPl,
 
                         videos:
                             Array.isArray(
@@ -772,7 +383,6 @@ window.cloudAddVideoToDB =
                 );
 
             }
-
 
             return true;
 
@@ -803,10 +413,6 @@ window.cloudUpdateDatabase =
 
         try {
 
-            /* -----------------------------------------
-               SINGLE VIDEOS
-            ----------------------------------------- */
-
             await setDoc(
 
                 doc(
@@ -829,63 +435,37 @@ window.cloudUpdateDatabase =
             );
 
 
-            /* -----------------------------------------
-               PLAYLISTS
-            ----------------------------------------- */
-
-            if (
-                Array.isArray(
-                    playlistsArr
-                )
+            for (
+                const pl
+                of playlistsArr
             ) {
 
-                for (
-                    const pl
-                    of playlistsArr
-                ) {
+                await setDoc(
 
-                    if (
-                        !pl ||
-                        !pl.id
-                    ) {
+                    doc(
+                        db,
+                        "playlists",
+                        pl.id
+                    ),
 
-                        continue;
+                    {
+
+                        id: pl.id,
+
+                        name: pl.name,
+
+                        videos:
+                            Array.isArray(
+                                pl.videos
+                            )
+                                ? pl.videos
+                                : []
 
                     }
 
-
-                    await setDoc(
-
-                        doc(
-                            db,
-                            "playlists",
-                            pl.id
-                        ),
-
-                        {
-
-                            id:
-                                pl.id,
-
-                            name:
-                                pl.name ||
-                                "Untitled Playlist",
-
-                            videos:
-                                Array.isArray(
-                                    pl.videos
-                                )
-                                    ? pl.videos
-                                    : []
-
-                        }
-
-                    );
-
-                }
+                );
 
             }
-
 
             return true;
 
@@ -910,6 +490,13 @@ window.cloudUpdateDatabase =
 
 async function loadCloudData() {
 
+    if (!window.cloudFetchData) {
+
+        return false;
+
+    }
+
+
     try {
 
         const dbRes =
@@ -933,13 +520,10 @@ async function loadCloudData() {
 
 
         localStorage.setItem(
-
             "vissaSingleVideos",
-
             JSON.stringify(
                 singleVideos
             )
-
         );
 
 
@@ -953,11 +537,6 @@ async function loadCloudData() {
             e
         );
 
-        alert(
-            "Firestore data load කිරීමට නොහැකි විය.\n\n" +
-            e.message
-        );
-
         return false;
 
     }
@@ -969,34 +548,25 @@ async function loadCloudData() {
    PAGE LOAD
 ========================================================= */
 
-window.addEventListener(
-    "load",
-    async function () {
+window.onload = async function () {
 
-        const loggedUser =
-            localStorage.getItem(
-                "vissaLoggedUser"
-            );
+    const loggedUser =
+        localStorage.getItem(
+            "vissaLoggedUser"
+        );
 
 
-        if (loggedUser) {
+    if (loggedUser) {
 
-            const loaded =
-                await loadCloudData();
+        await loadCloudData();
 
-
-            if (loaded) {
-
-                initDashboard(
-                    loggedUser
-                );
-
-            }
-
-        }
+        initDashboard(
+            loggedUser
+        );
 
     }
-);
+
+};
 
 
 /* =========================================================
@@ -1022,31 +592,17 @@ window.toggleSideMenu =
             overlay
         ) {
 
-            const isOpen =
+            drawer.classList.toggle(
+                "open"
+            );
+
+
+            overlay.style.display =
                 drawer.classList.contains(
                     "open"
-                );
-
-
-            if (isOpen) {
-
-                drawer.classList.remove(
-                    "open"
-                );
-
-                overlay.style.display =
-                    "none";
-
-            } else {
-
-                drawer.classList.add(
-                    "open"
-                );
-
-                overlay.style.display =
-                    "block";
-
-            }
+                )
+                    ? "block"
+                    : "none";
 
         }
 
@@ -1065,13 +621,10 @@ window.switchPageView =
                 ".page-view"
             )
             .forEach(
-                function (v) {
-
+                v =>
                     v.classList.remove(
                         "active-view"
-                    );
-
-                }
+                    )
             );
 
 
@@ -1080,13 +633,10 @@ window.switchPageView =
                 ".drawer-nav-item button"
             )
             .forEach(
-                function (b) {
-
+                b =>
                     b.classList.remove(
                         "active"
-                    );
-
-                }
+                    )
             );
 
 
@@ -1095,6 +645,9 @@ window.switchPageView =
             home:
                 "viewHome",
 
+            makemoney:
+                "viewMakeMoney",
+
             comments:
                 "viewComments",
 
@@ -1102,13 +655,6 @@ window.switchPageView =
                 "viewAccount"
 
         };
-
-
-        /*
-           Make Money page is no longer required.
-           If your HTML still has it, it will simply not
-           be selected from the menu unless you add it back.
-        */
 
 
         const targetView =
@@ -1129,7 +675,9 @@ window.switchPageView =
         const navBtn =
             document.getElementById(
                 "nav" +
-                page.charAt(0).toUpperCase() +
+                page
+                    .charAt(0)
+                    .toUpperCase() +
                 page.slice(1)
             );
 
@@ -1143,37 +691,7 @@ window.switchPageView =
         }
 
 
-        /*
-           Close drawer directly instead of using
-           toggle, so repeated calls cannot reopen it.
-        */
-
-        const drawer =
-            document.getElementById(
-                "sideDrawer"
-            );
-
-        const overlay =
-            document.getElementById(
-                "menuOverlay"
-            );
-
-
-        if (drawer) {
-
-            drawer.classList.remove(
-                "open"
-            );
-
-        }
-
-
-        if (overlay) {
-
-            overlay.style.display =
-                "none";
-
-        }
+        window.toggleSideMenu();
 
     };
 
@@ -1200,8 +718,7 @@ window.postComment =
         const loggedUser =
             localStorage.getItem(
                 "vissaLoggedUser"
-            ) ||
-            "User";
+            ) || "User";
 
 
         if (!text) {
@@ -1237,46 +754,29 @@ window.postComment =
                 "border-left:3px solid #ff0000;";
 
 
-            /*
-               textContent is used for the user comment
-               so HTML entered into the comment is not executed.
-            */
+            newComment.innerHTML = `
 
-            const userDiv =
-                document.createElement(
-                    "div"
-                );
+                <div
+                    style="
+                    font-size:0.85rem;
+                    color:#ff0000;
+                    font-weight:bold;
+                    margin-bottom:4px;
+                    "
+                >
+                    ${loggedUser}
+                </div>
 
-            userDiv.style =
-                "font-size:0.85rem;" +
-                "color:#ff0000;" +
-                "font-weight:bold;" +
-                "margin-bottom:4px;";
+                <div
+                    style="
+                    font-size:0.95rem;
+                    color:#ddd;
+                    "
+                >
+                    ${text}
+                </div>
 
-            userDiv.textContent =
-                loggedUser;
-
-
-            const textDiv =
-                document.createElement(
-                    "div"
-                );
-
-            textDiv.style =
-                "font-size:0.95rem;" +
-                "color:#ddd;";
-
-            textDiv.textContent =
-                text;
-
-
-            newComment.appendChild(
-                userDiv
-            );
-
-            newComment.appendChild(
-                textDiv
-            );
+            `;
 
 
             list.prepend(
@@ -1338,7 +838,9 @@ window.closeAuthModal =
 
 
 /* =========================================================
-   EMAILJS OTP
+   EMAIL OTP LOGIN
+   EmailJS is kept because it is used
+   for login verification.
 ========================================================= */
 
 window.sendOTPCode =
@@ -1418,9 +920,7 @@ window.sendOTPCode =
             function () {
 
                 alert(
-                    "Verification Code එක " +
-                    userEmail +
-                    " වෙත යවන ලදී."
+                    `Verification Code එක ${userEmail} වෙත යවන ලදී.`
                 );
 
 
@@ -1457,19 +957,9 @@ window.sendOTPCode =
         .catch(
             function (err) {
 
-                console.error(
-                    "EmailJS Error:",
-                    err
-                );
-
-
                 alert(
-                    "Email යැවීමේදී දෝෂයක්:\n\n" +
-                    (
-                        err.text ||
-                        err.message ||
-                        JSON.stringify(err)
-                    )
+                    "Email යැවීමේදී දෝෂයක්: " +
+                    JSON.stringify(err)
                 );
 
             }
@@ -1491,37 +981,17 @@ window.verifyOTPCode =
             );
 
 
-        const enteredOTP =
-            otpInput
-                ? otpInput.value.trim()
-                : "";
-
-
         if (
-            generatedOTP &&
-            enteredOTP ===
+            otpInput &&
+            otpInput.value.trim() ===
             generatedOTP
         ) {
 
-            const verifiedEmail =
-                pendingEmail;
-
-
-            generatedOTP =
-                null;
-
-
-            pendingEmail =
-                "";
-
-
             window.closeAuthModal();
 
-
             loginSuccess(
-                verifiedEmail
+                pendingEmail
             );
-
 
         } else {
 
@@ -1540,30 +1010,13 @@ window.verifyOTPCode =
 
 async function loginSuccess(email) {
 
-    if (!email) {
-
-        throw new Error(
-            "Login email is missing."
-        );
-
-    }
-
-
     localStorage.setItem(
         "vissaLoggedUser",
         email
     );
 
 
-    const loaded =
-        await loadCloudData();
-
-
-    if (!loaded) {
-
-        return;
-
-    }
+    await loadCloudData();
 
 
     initDashboard(
@@ -1712,31 +1165,11 @@ function initDashboard(email) {
 ========================================================= */
 
 window.logout =
-    async function () {
-
-        try {
-
-            await signOut(
-                auth
-            );
-
-        } catch (e) {
-
-            console.error(
-                "Firebase Logout Error:",
-                e
-            );
-
-        }
-
+    function () {
 
         localStorage.removeItem(
             "vissaLoggedUser"
         );
-
-
-        isAdminLoggedIn =
-            false;
 
 
         const appScreen =
@@ -1870,8 +1303,7 @@ function render() {
     }
 
 
-    container.innerHTML =
-        "";
+    container.innerHTML = "";
 
 
     if (subTabs) {
@@ -1882,9 +1314,9 @@ function render() {
     }
 
 
-    /* -----------------------------------------
+    /* -------------------------------
        ALL VIDEOS
-    ----------------------------------------- */
+    -------------------------------- */
 
     if (
         currentView ===
@@ -1896,20 +1328,12 @@ function render() {
 
 
         playlistsData.forEach(
-            function (pl) {
+            pl => {
 
-                if (
-                    Array.isArray(
+                allCombined =
+                    allCombined.concat(
                         pl.videos
-                    )
-                ) {
-
-                    allCombined =
-                        allCombined.concat(
-                            pl.videos
-                        );
-
-                }
+                    );
 
             }
         );
@@ -1945,15 +1369,14 @@ function render() {
             "none"
         );
 
-
         return;
 
     }
 
 
-    /* -----------------------------------------
+    /* -------------------------------
        PLAYLISTS
-    ----------------------------------------- */
+    -------------------------------- */
 
     if (
         currentView ===
@@ -2000,7 +1423,7 @@ function render() {
 
 
             playlistsData.forEach(
-                function (pl) {
+                pl => {
 
                     const card =
                         document.createElement(
@@ -2013,7 +1436,7 @@ function render() {
 
 
                     card.onclick =
-                        function () {
+                        () => {
 
                             selectedPlaylistId =
                                 pl.id;
@@ -2023,14 +1446,6 @@ function render() {
                         };
 
 
-                    const videoCount =
-                        Array.isArray(
-                            pl.videos
-                        )
-                            ? pl.videos.length
-                            : 0;
-
-
                     card.innerHTML = `
 
                         <i
@@ -2038,9 +1453,7 @@ function render() {
                         ></i>
 
                         <h3>
-                            ${escapeHTML(
-                                pl.name
-                            )}
+                            ${pl.name}
                         </h3>
 
                         <span
@@ -2049,7 +1462,7 @@ function render() {
                             font-size:0.85rem;
                             "
                         >
-                            ${videoCount}
+                            ${pl.videos.length}
                             Videos
                         </span>
 
@@ -2084,31 +1497,18 @@ function render() {
 
             const currentPl =
                 playlistsData.find(
-                    function (pl) {
-
-                        return (
-                            pl.id ===
-                            selectedPlaylistId
-                        );
-
-                    }
+                    pl =>
+                        pl.id ===
+                        selectedPlaylistId
                 );
 
 
             if (currentPl) {
 
                 renderVideoCards(
-
-                    Array.isArray(
-                        currentPl.videos
-                    )
-                        ? currentPl.videos
-                        : [],
-
+                    currentPl.videos,
                     container,
-
                     currentPl.id
-
                 );
 
             }
@@ -2144,7 +1544,7 @@ function renderSubTabs() {
         <button
             class="sub-tab-btn animated-box-frame"
             onclick="
-                selectedPlaylistId = null;
+                selectedPlaylistId=null;
                 render();
             "
         >
@@ -2161,7 +1561,7 @@ function renderSubTabs() {
 
 
     playlistsData.forEach(
-        function (pl) {
+        pl => {
 
             const btn =
                 document.createElement(
@@ -2170,13 +1570,11 @@ function renderSubTabs() {
 
 
             btn.className =
-                "sub-tab-btn animated-box-frame " +
-                (
-                    pl.id ===
-                    selectedPlaylistId
+                `sub-tab-btn animated-box-frame ${
+                    pl.id === selectedPlaylistId
                         ? "active"
                         : ""
-                );
+                }`;
 
 
             btn.innerText =
@@ -2184,7 +1582,7 @@ function renderSubTabs() {
 
 
             btn.onclick =
-                function () {
+                () => {
 
                     selectedPlaylistId =
                         pl.id;
@@ -2205,29 +1603,6 @@ function renderSubTabs() {
 
 
 /* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    div.textContent =
-        value == null
-            ? ""
-            : String(value);
-
-
-    return div.innerHTML;
-
-}
-
-
-/* =========================================================
    VIDEO CARDS
 ========================================================= */
 
@@ -2237,29 +1612,8 @@ function renderVideoCards(
     playlistContextId
 ) {
 
-    if (
-        !Array.isArray(
-            videos
-        )
-    ) {
-
-        return;
-
-    }
-
-
     videos.forEach(
-        function (vid) {
-
-            if (
-                !vid ||
-                !vid.id
-            ) {
-
-                return;
-
-            }
-
+        vid => {
 
             const card =
                 document.createElement(
@@ -2287,12 +1641,8 @@ function renderVideoCards(
                     <button
                         onclick="
                             removeVideo(
-                                '${escapeAttribute(
-                                    playlistContextId
-                                )}',
-                                '${escapeAttribute(
-                                    vidIdentifier
-                                )}'
+                                '${playlistContextId}',
+                                '${vidIdentifier}'
                             )
                         "
                         style="
@@ -2320,26 +1670,6 @@ function renderVideoCards(
             }
 
 
-            const title =
-                escapeHTML(
-                    vid.title ||
-                    "Untitled Video"
-                );
-
-
-            const description =
-                escapeHTML(
-                    vid.description ||
-                    ""
-                );
-
-
-            const videoId =
-                encodeURIComponent(
-                    vid.id
-                );
-
-
             card.innerHTML = `
 
                 <div
@@ -2347,9 +1677,9 @@ function renderVideoCards(
                 >
 
                     <iframe
-                        src="https://www.youtube.com/embed/${videoId}"
-                        title="${title}"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        src="
+                            https://www.youtube.com/embed/${vid.id}
+                        "
                         allowfullscreen
                     ></iframe>
 
@@ -2363,14 +1693,14 @@ function renderVideoCards(
                     <h2
                         class="video-title"
                     >
-                        ${title}
+                        ${vid.title}
                     </h2>
 
 
                     <div
                         class="video-description"
                     >
-                        ${description}
+                        ${vid.description}
                     </div>
 
 
@@ -2385,9 +1715,10 @@ function renderVideoCards(
                     >
 
                         <a
-                            href="https://www.youtube.com/watch?v=${videoId}"
+                            href="
+                                https://www.youtube.com/watch?v=${vid.id}
+                            "
                             target="_blank"
-                            rel="noopener noreferrer"
                             class="yt-btn"
                         >
 
@@ -2420,49 +1751,11 @@ function renderVideoCards(
 
 
 /* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
-function escapeAttribute(value) {
-
-    return String(
-        value == null
-            ? ""
-            : value
-    )
-        .replace(
-            /\\/g,
-            "\\\\"
-        )
-        .replace(
-            /'/g,
-            "\\'"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        );
-
-}
-
-
-/* =========================================================
    ADD PLAYLIST
 ========================================================= */
 
 window.addPlaylist =
     async function () {
-
-        if (!isAdminLoggedIn) {
-
-            alert(
-                "Admin access required."
-            );
-
-            return;
-
-        }
-
 
         const nameInput =
             document.getElementById(
@@ -2496,8 +1789,7 @@ window.addPlaylist =
             name:
                 name,
 
-            videos:
-                []
+            videos: []
 
         };
 
@@ -2519,8 +1811,7 @@ window.addPlaylist =
 
             if (nameInput) {
 
-                nameInput.value =
-                    "";
+                nameInput.value = "";
 
             }
 
@@ -2537,14 +1828,8 @@ window.addPlaylist =
 
         } catch (e) {
 
-            console.error(
-                "Playlist save error:",
-                e
-            );
-
-
             alert(
-                "Playlist save කිරීමට නොහැකි විය:\n\n" +
+                "Playlist save කිරීමට නොහැකි විය: " +
                 e.message
             );
 
@@ -2559,179 +1844,24 @@ window.addPlaylist =
 
 function extractVideoID(url) {
 
-    try {
-
-        const parsed =
-            new URL(
-                url
-            );
+    let cleanUrl =
+        url
+            .split("?")[0]
+            .split("&")[0];
 
 
-        const hostname =
-            parsed.hostname
-                .toLowerCase();
-
-
-        /* -----------------------------------------
-           youtu.be/VIDEO_ID
-        ----------------------------------------- */
-
-        if (
-            hostname ===
-                "youtu.be" ||
-            hostname.endsWith(
-                ".youtu.be"
-            )
-        ) {
-
-            const id =
-                parsed.pathname
-                    .replace(
-                        /^\/+/,
-                        ""
-                    )
-                    .split("/")[0];
-
-
-            return id &&
-                id.length === 11
-                ? id
-                : null;
-
-        }
-
-
-        /* -----------------------------------------
-           youtube.com/watch?v=VIDEO_ID
-        ----------------------------------------- */
-
-        if (
-            hostname.includes(
-                "youtube.com"
-            )
-        ) {
-
-            const v =
-                parsed.searchParams.get(
-                    "v"
-                );
-
-
-            if (
-                v &&
-                v.length === 11
-            ) {
-
-                return v;
-
-            }
-
-
-            /* -------------------------------------
-               /embed/VIDEO_ID
-            ------------------------------------- */
-
-            const parts =
-                parsed.pathname
-                    .split("/")
-                    .filter(
-                        Boolean
-                    );
-
-
-            const embedIndex =
-                parts.indexOf(
-                    "embed"
-                );
-
-
-            if (
-                embedIndex !== -1 &&
-                parts[embedIndex + 1]
-            ) {
-
-                const id =
-                    parts[
-                        embedIndex + 1
-                    ];
-
-
-                return id.length === 11
-                    ? id
-                    : null;
-
-            }
-
-
-            /* -------------------------------------
-               /shorts/VIDEO_ID
-            ------------------------------------- */
-
-            const shortsIndex =
-                parts.indexOf(
-                    "shorts"
-                );
-
-
-            if (
-                shortsIndex !== -1 &&
-                parts[shortsIndex + 1]
-            ) {
-
-                const id =
-                    parts[
-                        shortsIndex + 1
-                    ];
-
-
-                return id.length === 11
-                    ? id
-                    : null;
-
-            }
-
-
-            /* -------------------------------------
-               /live/VIDEO_ID
-            ------------------------------------- */
-
-            const liveIndex =
-                parts.indexOf(
-                    "live"
-                );
-
-
-            if (
-                liveIndex !== -1 &&
-                parts[liveIndex + 1]
-            ) {
-
-                const id =
-                    parts[
-                        liveIndex + 1
-                    ];
-
-
-                return id.length === 11
-                    ? id
-                    : null;
-
-            }
-
-        }
-
-
-    } catch (e) {
-
-        console.error(
-            "YouTube URL Parse Error:",
-            e
+    const match =
+        cleanUrl.match(
+            /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/
         );
 
-    }
 
-
-    return null;
+    return (
+        match &&
+        match[2].length === 11
+    )
+        ? match[2]
+        : null;
 
 }
 
@@ -2742,17 +1872,6 @@ function extractVideoID(url) {
 
 window.addVideo =
     async function () {
-
-        if (!isAdminLoggedIn) {
-
-            alert(
-                "Admin access required."
-            );
-
-            return;
-
-        }
-
 
         const targetPlEl =
             document.getElementById(
@@ -2796,7 +1915,7 @@ window.addVideo =
                 titleInputElem.value.trim()
             )
                 ? titleInputElem.value.trim()
-                : "OL Commerce With Damith";
+                : "VissaPro Exclusive Video";
 
 
         const description =
@@ -2805,7 +1924,7 @@ window.addVideo =
                 descInputElem.value.trim()
             )
                 ? descInputElem.value.trim()
-                : "මෙම වීඩියෝව OL Commerce With Damith හරහා නරඹන්න.";
+                : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
 
 
         if (!linkInput) {
@@ -2860,31 +1979,19 @@ window.addVideo =
         try {
 
             let nextSingleVideos =
-                [
-                    ...singleVideos
-                ];
+                [...singleVideos];
 
 
             let nextPlaylistsData =
                 playlistsData.map(
-                    function (pl) {
+                    pl => ({
 
-                        return {
+                        ...pl,
 
-                            ...pl,
+                        videos:
+                            [...pl.videos]
 
-                            videos:
-                                Array.isArray(
-                                    pl.videos
-                                )
-                                    ? [
-                                        ...pl.videos
-                                    ]
-                                    : []
-
-                        };
-
-                    }
+                    })
                 );
 
 
@@ -2902,14 +2009,9 @@ window.addVideo =
 
                 const targetPl =
                     nextPlaylistsData.find(
-                        function (pl) {
-
-                            return (
-                                pl.id ===
-                                targetPlId
-                            );
-
-                        }
+                        pl =>
+                            pl.id ===
+                            targetPlId
                     );
 
 
@@ -2968,24 +2070,21 @@ window.addVideo =
 
             if (linkInputEl) {
 
-                linkInputEl.value =
-                    "";
+                linkInputEl.value = "";
 
             }
 
 
             if (titleInputElem) {
 
-                titleInputElem.value =
-                    "";
+                titleInputElem.value = "";
 
             }
 
 
             if (descInputElem) {
 
-                descInputElem.value =
-                    "";
+                descInputElem.value = "";
 
             }
 
@@ -3000,14 +2099,8 @@ window.addVideo =
 
         } catch (e) {
 
-            console.error(
-                "Video save error:",
-                e
-            );
-
-
             alert(
-                "Video save කිරීමට නොහැකි විය:\n\n" +
+                "Video save කිරීමට නොහැකි විය: " +
                 e.message
             );
 
@@ -3026,17 +2119,6 @@ window.removeVideo =
         videoFirebaseId
     ) {
 
-        if (!isAdminLoggedIn) {
-
-            alert(
-                "Admin access required."
-            );
-
-            return;
-
-        }
-
-
         if (
             !confirm(
                 "මෙම වීඩියෝව ඉවත් කිරීමට ඔබට අවශ්‍ය බව විශ්වාසද?"
@@ -3051,31 +2133,19 @@ window.removeVideo =
         try {
 
             let nextSingleVideos =
-                [
-                    ...singleVideos
-                ];
+                [...singleVideos];
 
 
             let nextPlaylistsData =
                 playlistsData.map(
-                    function (pl) {
+                    pl => ({
 
-                        return {
+                        ...pl,
 
-                            ...pl,
+                        videos:
+                            [...pl.videos]
 
-                            videos:
-                                Array.isArray(
-                                    pl.videos
-                                )
-                                    ? [
-                                        ...pl.videos
-                                    ]
-                                    : []
-
-                        };
-
-                    }
+                    })
                 );
 
 
@@ -3086,16 +2156,15 @@ window.removeVideo =
 
                 nextSingleVideos =
                     nextSingleVideos.filter(
-                        function (v) {
 
-                            return (
-                                v.firebaseId !==
-                                    videoFirebaseId &&
-                                v.id !==
-                                    videoFirebaseId
-                            );
+                        v =>
 
-                        }
+                            v.firebaseId !==
+                            videoFirebaseId &&
+
+                            v.id !==
+                            videoFirebaseId
+
                     );
 
 
@@ -3103,14 +2172,9 @@ window.removeVideo =
 
                 const targetPl =
                     nextPlaylistsData.find(
-                        function (pl) {
-
-                            return (
-                                pl.id ===
-                                playlistId
-                            );
-
-                        }
+                        pl =>
+                            pl.id ===
+                            playlistId
                     );
 
 
@@ -3118,16 +2182,15 @@ window.removeVideo =
 
                     targetPl.videos =
                         targetPl.videos.filter(
-                            function (v) {
 
-                                return (
-                                    v.firebaseId !==
-                                        videoFirebaseId &&
-                                    v.id !==
-                                        videoFirebaseId
-                                );
+                            v =>
 
-                            }
+                                v.firebaseId !==
+                                videoFirebaseId &&
+
+                                v.id !==
+                                videoFirebaseId
+
                         );
 
                 }
@@ -3135,13 +2198,20 @@ window.removeVideo =
             }
 
 
-            await window.cloudUpdateDatabase(
+            if (
+                typeof window.cloudUpdateDatabase ===
+                "function"
+            ) {
 
-                nextSingleVideos,
+                await window.cloudUpdateDatabase(
 
-                nextPlaylistsData
+                    nextSingleVideos,
 
-            );
+                    nextPlaylistsData
+
+                );
+
+            }
 
 
             singleVideos =
@@ -3173,14 +2243,8 @@ window.removeVideo =
 
         } catch (e) {
 
-            console.error(
-                "Remove Video Error:",
-                e
-            );
-
-
             alert(
-                "වීඩියෝව ඉවත් කිරීම අසාර්ථක විය:\n\n" +
+                "වීඩියෝව ඉවත් කිරීම අසාර්ථක විය: " +
                 e.message
             );
 
@@ -3195,17 +2259,6 @@ window.removeVideo =
 
 window.openPlaylistModal =
     function () {
-
-        if (!isAdminLoggedIn) {
-
-            alert(
-                "Admin access required."
-            );
-
-            return;
-
-        }
-
 
         toggleFab();
 
@@ -3233,17 +2286,6 @@ window.openPlaylistModal =
 window.openVideoModal =
     function () {
 
-        if (!isAdminLoggedIn) {
-
-            alert(
-                "Admin access required."
-            );
-
-            return;
-
-        }
-
-
         toggleFab();
 
 
@@ -3256,33 +2298,23 @@ window.openVideoModal =
         if (select) {
 
             select.innerHTML =
-                `
-                <option value="none">
-                    -- None (Single Video / Direct Upload) --
-                </option>
-                `;
+                '<option value="none">' +
+                "-- None (Single Video / Direct Upload) --" +
+                "</option>";
 
 
             playlistsData.forEach(
-                function (pl) {
+                pl => {
 
-                    const option =
-                        document.createElement(
-                            "option"
-                        );
+                    select.innerHTML += `
 
+                        <option
+                            value="${pl.id}"
+                        >
+                            ${pl.name}
+                        </option>
 
-                    option.value =
-                        pl.id;
-
-
-                    option.textContent =
-                        pl.name;
-
-
-                    select.appendChild(
-                        option
-                    );
+                    `;
 
                 }
             );
@@ -3341,39 +2373,4 @@ window.closeAdminModals =
         }
 
     };
-
-
-/* =========================================================
-   GLOBAL ERROR HANDLER
-========================================================= */
-
-window.addEventListener(
-    "error",
-    function (event) {
-
-        console.error(
-            "Global JavaScript Error:",
-            event.error ||
-            event.message
-        );
-
-    }
-);
-
-
-window.addEventListener(
-    "unhandledrejection",
-    function (event) {
-
-        console.error(
-            "Unhandled Promise Error:",
-            event.reason
-        );
-
-    }
-);
-
-
-/* =========================================================
-   END OF INDEX.JS
-========================================================= */
+```
