@@ -1,12 +1,10 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-// Me line eka add karanna (Version eka dan oya use karana 12.19.0 ekata match wenna oone):
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
     apiKey: "AIzaSyBXWGA5kBY0qhmkL-wKZJ16VCjKsZM-4Gg",
     authDomain: "commerce-with-damith-manage.firebaseapp.com",
     projectId: "commerce-with-damith-manage",
@@ -14,12 +12,10 @@ import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://
     messagingSenderId: "646197742634",
     appId: "1:646197742634:web:0d4d69112babfba61d0753",
     measurementId: "G-DLSWTPW732"
-  };
-
- 
-
+};
 
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -44,7 +40,7 @@ if (googleLoginBtn) googleLoginBtn.addEventListener('click', window.triggerGoogl
 const facebookLoginBtn = document.getElementById('facebookLoginBtn');
 if (facebookLoginBtn) facebookLoginBtn.addEventListener('click', window.triggerFacebookLogin);
 
-// Firestore Data Fetching & Saving (Fixed)
+// Firestore Data Fetching & Saving
 window.cloudFetchData = async function() {
     try {
         const singleDocRef = doc(db, "appData", "singleVideosDoc");
@@ -146,18 +142,10 @@ window.onload = async function() {
 // EmailJS Init
 (function(){ emailjs.init("PjusIs1VJ5zFRcuZp"); })();
 
-const MY_ADMIN_GMAIL = "vimukthithuhina754@gmail.com"; 
-
-const LIMITS = {
-    paypal: 3.00,
-    binance: 4.50,
-    bank: 6.50
-};
+const MY_ADMIN_GMAIL = "waragodadamith@gmail.com"; 
 
 let generatedOTP = null;
 let pendingEmail = "";
-let userBalance = parseFloat(localStorage.getItem('vissaUserBalance')) || 0.00000;
-let selectedPaymentMethod = 'paypal';
 
 let singleVideos = [];
 let playlistsData = [];
@@ -179,7 +167,6 @@ async function loadCloudData() {
     }
 }
 
-// Fixed: Attached to window to prevent undefined errors in HTML onclick
 window.toggleSideMenu = function() {
     const drawer = document.getElementById('sideDrawer');
     const overlay = document.getElementById('menuOverlay');
@@ -189,15 +176,12 @@ window.toggleSideMenu = function() {
     }
 };
 
-// Fixed: Attached to window to handle page switching properly
 window.switchPageView = function(page) {
     document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
     document.querySelectorAll('.drawer-nav-item button').forEach(b => b.classList.remove('active'));
 
     const targetMap = {
         'home': 'viewHome',
-        'makemoney': 'viewMakeMoney',
-        'paymentDetails': 'viewPaymentDetails',
         'comments': 'viewComments',
         'account': 'viewAccount'
     };
@@ -209,133 +193,6 @@ window.switchPageView = function(page) {
     if (navBtn) navBtn.classList.add('active');
 
     window.toggleSideMenu();
-};
-
-function updateBalanceDisplay() {
-    localStorage.setItem('vissaUserBalance', userBalance.toFixed(5));
-
-    const formatted = '$' + userBalance.toFixed(5);
-    const accBalanceEl = document.getElementById('accBalance');
-    const withdrawDisplayBalanceEl = document.getElementById('withdrawDisplayBalance');
-    if (accBalanceEl) accBalanceEl.innerText = formatted;
-    if (withdrawDisplayBalanceEl) withdrawDisplayBalanceEl.innerText = formatted;
-
-    const currentLimit = LIMITS[selectedPaymentMethod];
-    const methodNameCap = selectedPaymentMethod.charAt(0).toUpperCase() + selectedPaymentMethod.slice(1);
-    
-    const timelineTitleText = document.getElementById('timelineTitleText');
-    const timelineMaxText = document.getElementById('timelineMaxText');
-    if (timelineTitleText) timelineTitleText.innerText = `${methodNameCap} Goal Progress ($${currentLimit.toFixed(2)} Target)`;
-    if (timelineMaxText) timelineMaxText.innerText = `$${currentLimit.toFixed(2)}`;
-
-    const percent = Math.min((userBalance / currentLimit) * 100, 100).toFixed(2);
-    const timelinePercent = document.getElementById('timelinePercent');
-    const timelineBarFill = document.getElementById('timelineBarFill');
-    if (timelinePercent) timelinePercent.innerText = percent + '%';
-    if (timelineBarFill) timelineBarFill.style.width = percent + '%';
-
-    const remaining = Math.max(0, currentLimit - userBalance).toFixed(5);
-    const remainingText = document.getElementById('remainingText');
-    if (remainingText) remainingText.innerText = `Remaining: $${remaining}`;
-}
-
-// Monetag Vignette Ad Integration Function
-window.watchAdAction = function(adTitle) {
-    // Monetag Vignette script dynamically load කිරීම
-    const script = document.createElement('script');
-    script.dataset.zone = '11825528';
-    script.src = 'https://n6wxm.com/vignette.min.js';
-    document.body.appendChild(script);
-
-    // User ගේ ගිණුමට මුදල් එකතු වීම සහ Balance එක update කිරීම
-    userBalance += 0.00010;
-    updateBalanceDisplay();
-    
-    alert(`"${adTitle}" සක්‍රිය විය! $0.00010 ක් ඔබගේ ගිණුමට එකතු විය.`);
-};
-
-window.selectPaymentMethod = function(method) {
-    selectedPaymentMethod = method;
-    document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.method-form').forEach(f => f.classList.remove('active'));
-
-    if (method === 'paypal') {
-        const btn = document.getElementById('btnMethodPaypal');
-        const form = document.getElementById('formPaypal');
-        if (btn) btn.classList.add('active');
-        if (form) form.classList.add('active');
-    } else if (method === 'binance') {
-        const btn = document.getElementById('btnMethodBinance');
-        const form = document.getElementById('formBinance');
-        if (btn) btn.classList.add('active');
-        if (form) form.classList.add('active');
-    } else if (method === 'bank') {
-        const btn = document.getElementById('btnMethodBank');
-        const form = document.getElementById('formBank');
-        if (btn) btn.classList.add('active');
-        if (form) form.classList.add('active');
-    }
-
-    updateBalanceDisplay();
-};
-
-window.requestWithdrawal = function() {
-    const loggedUser = localStorage.getItem('vissaLoggedUser') || 'User';
-    const amountInput = document.getElementById('wAmount');
-    const amount = amountInput ? amountInput.value.trim() : "";
-    const minLimit = LIMITS[selectedPaymentMethod];
-    let detailsText = "";
-
-    if (userBalance < minLimit) {
-        const rem = (minLimit - userBalance).toFixed(5);
-        alert(`Withdraw කිරීමට නොහැක!\n\n${selectedPaymentMethod.toUpperCase()} සඳහා අවම Withdrawal limit එක $${minLimit.toFixed(2)} කි.\nඔබට තව $${rem} ක් ලබා ගැනීමට අවශ්‍යයි.`);
-        return;
-    }
-
-    if (!amount || parseFloat(amount) <= 0) {
-        alert('කරුණාකර Withdraw කිරීමට අවශ්‍ය ඩොලර් ගණන ඇතුළත් කරන්න!');
-        return;
-    }
-
-    if (parseFloat(amount) > userBalance) {
-        alert('ඔබගේ Total Balance එකට වඩා වැඩි මුදලක් Withdraw කිරීමට නොහැක!');
-        return;
-    }
-
-    if (selectedPaymentMethod === 'paypal') {
-        const ppEmailEl = document.getElementById('wPaypalEmail');
-        const ppEmail = ppEmailEl ? ppEmailEl.value.trim() : "";
-        if (!ppEmail) { alert('කරුණාකර PayPal Email එක ඇතුළත් කරන්න!'); return; }
-        detailsText = `Method: PayPal\nPayPal Email: ${ppEmail}`;
-    } else if (selectedPaymentMethod === 'binance') {
-        const bIdEl = document.getElementById('wBinanceId');
-        const bId = bIdEl ? bIdEl.value.trim() : "";
-        if (!bId) { alert('කරුණාකර Binance Pay ID හෝ Address එක ඇතුළත් කරන්න!'); return; }
-        detailsText = `Method: Binance\nBinance Pay ID/Address: ${bId}`;
-    } else if (selectedPaymentMethod === 'bank') {
-        const bankEl = document.getElementById('wBankName');
-        const accEl = document.getElementById('wAccNumber');
-        const branchEl = document.getElementById('wBranch');
-        const nameEl = document.getElementById('wAccName');
-        const bank = bankEl ? bankEl.value.trim() : "";
-        const acc = accEl ? accEl.value.trim() : "";
-        const branch = branchEl ? branchEl.value.trim() : "";
-        const name = nameEl ? nameEl.value.trim() : "";
-        if (!bank || !acc || !branch || !name) { alert('කරුණාකර සියලුම බැංකු තොරතුරු ඇතුළත් කරන්න!'); return; }
-        detailsText = `Method: Bank Transfer\nBank: ${bank}\nAcc No: ${acc}\nBranch: ${branch}\nName: ${name}`;
-    }
-
-    const withdrawMessage = `User [ ${loggedUser} ] මේක unlock කරන් තියෙන්නේ. මෙන්න මේ ඩොලර් ගණන ($${amount}) withdraw කරන්න.\n\nCurrent User Total Balance: $${userBalance.toFixed(5)}\nRequired Threshold Passed: $${minLimit.toFixed(2)}\n\n--- Withdrawal Details ---\n${detailsText}`;
-
-    emailjs.send('service_0dhcgr3', 'template_cu3r1wj', { email: MY_ADMIN_GMAIL, passcode: withdrawMessage })
-        .then(function() {
-            alert('ඔබගේ Withdrawal Request එක සාර්ථකව Admin වෙත යවන ලදී!');
-            userBalance -= parseFloat(amount);
-            updateBalanceDisplay();
-            if (amountInput) amountInput.value = '';
-        }, function(error) {
-            alert('යැවීමේදී දෝෂයක් සිදු විය: ' + JSON.stringify(error));
-        });
 };
 
 window.postComment = function() {
@@ -430,7 +287,6 @@ function initDashboard(email) {
         isAdminLoggedIn = false;
     }
 
-    updateBalanceDisplay();
     render();
 }
 
@@ -570,8 +426,8 @@ window.addVideo = async function() {
     const titleInputElem = document.getElementById('customTitle');
     const descInputElem = document.getElementById('customDesc');
 
-    let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "VissaPro Exclusive Video";
-    let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව VissaPro Hub එක හරහා නරඹන්න.";
+    let title = (titleInputElem && titleInputElem.value.trim()) ? titleInputElem.value.trim() : "WMD COMMERCE Exclusive Video";
+    let description = (descInputElem && descInputElem.value.trim()) ? descInputElem.value.trim() : "මෙම වීඩියෝව wmd commerce yt channel එක හරහා නරඹන්න.";
 
     if (!linkInput) { 
         alert("කරුණාකර YouTube Link එකක් ඇතුළත් කරන්න!"); 
