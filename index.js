@@ -6,7 +6,7 @@ import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://
 const firebaseConfig = {
   apiKey: "AIzaSyB5wZsZwi2KNqlK_HK0GUkdvd9TGtJ4wLE",
   authDomain: "damith-ef0c4.firebaseapp.com",
-  projectId: "damith-ef0c4",
+  projectId: "commerce-with-damith-manage",
   storageBucket: "damith-ef0c4.firebasestorage.app",
   messagingSenderId: "949675663684",
   appId: "1:949675663684:web:1620c9e8a57e376573b711",
