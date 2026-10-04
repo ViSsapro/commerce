@@ -31,7 +31,7 @@ import {
 
 const firebaseConfig = {
     apiKey: "AIzaSyBXWGA5kBY0qhmkL-wKZJ16VCjKsZM-4Gg",
-    authDomain: "commerce-with-damith-manage.firebaseapp.com",
+    authDomain: "damith-manage.vissapro581.workers.dev",
     projectId: "commerce-with-damith-manage",
     storageBucket: "commerce-with-damith-manage.firebasestorage.app",
     messagingSenderId: "646197742634",
